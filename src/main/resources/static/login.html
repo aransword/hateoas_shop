@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JWT 로그인 테스트</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f9; }
+        .login-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 300px; }
+        .login-container h2 { text-align: center; margin-bottom: 20px; }
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; margin-bottom: 5px; }
+        .input-group input { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:hover { background-color: #218838; }
+        #message { margin-top: 15px; text-align: center; font-size: 0.9em; }
+        .success { color: green; }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+
+<div class="login-container">
+    <h2>로그인</h2>
+    <form id="loginForm">
+        <div class="input-group">
+            <label for="username">아이디</label>
+            <input type="text" id="username" required>
+        </div>
+        <div class="input-group">
+            <label for="password">비밀번호</label>
+            <input type="password" id="password" required>
+        </div>
+        <button type="submit">로그인</button>
+    </form>
+    <div id="message"></div>
+</div>
+
+<script>
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+        e.preventDefault(); // 폼의 기본 제출(새로고침) 동작을 막음
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+        const messageDiv = document.getElementById('message');
+
+        // 서버의 POST /auth/login API로 JSON 데이터를 보냄
+        fetch('/auth/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: username,
+                password: password
+            })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('로그인 실패: 아이디나 비밀번호를 확인해주세요.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // 성공 시 발급받은 JWT 토큰을 브라우저의 localStorage에 저장
+            localStorage.setItem('jwtToken', data.token);
+
+            messageDiv.textContent = '로그인 성공! 토큰이 발급되었습니다.';
+            messageDiv.className = 'success';
+
+            console.log("발급된 토큰:", data.token);
+            // 필요하다면 여기서 다른 페이지(예: /series.html)로 이동시킬 수 있음
+            // window.location.href = '/test-page.html';
+        })
+        .catch(error => {
+            messageDiv.textContent = error.message;
+            messageDiv.className = 'error';
+        });
+    });
+</script>
+
+</body>
+</html>
