@@ -55,7 +55,7 @@ API 응답 모델이 단순한 데이터를 넘어 `EntityModel` 및 `PagedModel
 - `DELETE /ratings/{seriesId}`: 인증된 사용자가 본인이 등록한 평점을 삭제하여 리뷰 권한을 회수합니다.
 
 
-## 🖥️ Swagger
+### 🖥️ Swagger
 - `GET /swagger-ui/index.html`: Swagger를 통해서 각 API의 동작을 실현해볼 수 있습니다.
 
 ---
