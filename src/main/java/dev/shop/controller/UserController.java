@@ -3,6 +3,9 @@ package dev.shop.controller;
 import dev.shop.model.User;
 import dev.shop.repository.UserRepository;
 import dev.shop.response.UserResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -20,6 +23,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 @RequestMapping("/users")
 @RequiredArgsConstructor
+@Tag(name="사용자 정보 API", description = "사용자 자신의 정보를 조회하는 API")
 public class UserController {
     private final UserRepository userRepository;
 
@@ -29,8 +33,9 @@ public class UserController {
      * @param userDetails
      * @return
      */
+    @Operation(summary = "사용자 정보 조회", description = "로그인된 사용자의 정보를 username 기반으로 조회한다.")
     @GetMapping("/{username}")
-    public EntityModel<UserResponse> getUser(@PathVariable String username, @AuthenticationPrincipal UserDetails userDetails) {
+    public EntityModel<UserResponse> getUser(@Parameter(description = "조회할 유저의 아이디", example = "user") @PathVariable String username, @AuthenticationPrincipal UserDetails userDetails) {
         if (!username.equals(userDetails.getUsername())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "자신의 정보만 조회할 수 있습니다.");
         }

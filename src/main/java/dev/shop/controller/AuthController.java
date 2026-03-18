@@ -5,6 +5,8 @@ import dev.shop.model.User;
 import dev.shop.repository.UserRepository;
 import dev.shop.response.JwtResponse;
 import dev.shop.request.LoginRequest;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Tag(name = "인증 관련 API", description = "인증과 관련한 동작을 수행한다.")
 public class AuthController {
 
     private final UserRepository userRepository;
@@ -23,6 +26,7 @@ public class AuthController {
     private final JwtTokenProvider tokenProvider;
 
     @PostMapping("/login")
+    @Operation(summary = "로그인", description = "로그인을 수행한다.")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
         User user = userRepository.findById(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));

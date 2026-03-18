@@ -2,7 +2,11 @@ package dev.shop.controller;
 
 import dev.shop.model.Series;
 import dev.shop.repository.SeriesRepository;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -21,6 +25,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 @RequestMapping("/series")
 @RequiredArgsConstructor
+@Tag(name = "시리즈 정보 API", description = "시리즈의 정보를 조회하는 API")
 public class SeriesController {
     private final SeriesRepository seriesRepository;
     private final PagedResourcesAssembler<Series> assembler;
@@ -31,7 +36,8 @@ public class SeriesController {
      * @return
      */
     @GetMapping("/list")
-    public ResponseEntity<PagedModel<EntityModel<Series>>> getSeriesList(@PageableDefault(size = 5) Pageable pageable) {
+    @Operation(summary = "시리즈 목록을 조회", description = "페이지 단위로 시리즈 목록을 조회한다.")
+    public ResponseEntity<PagedModel<EntityModel<Series>>> getSeriesList(@ParameterObject @PageableDefault(size = 5) Pageable pageable) {
 
         Page<Series> seriesPage = seriesRepository.findAll(pageable);
 
@@ -52,7 +58,8 @@ public class SeriesController {
      * @return
      */
     @GetMapping("/{id}")
-    public EntityModel<Series> getSeriesDetail(@PathVariable Long id) {
+    @Operation(summary = "단일 시리즈 조회", description = "시리즈 ID를 기준으로 시리즈 정보를 조회한다.")
+    public EntityModel<Series> getSeriesDetail(@Parameter(description = "조회할 시리즈 ID") @PathVariable Long id) {
         Series series = seriesRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("시리즈를 찾을 수 없습니다."));
 

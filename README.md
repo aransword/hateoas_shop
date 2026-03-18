@@ -53,3 +53,13 @@ API 응답 모델이 단순한 데이터를 넘어 `EntityModel` 및 `PagedModel
 - `POST /ratings`: 인증된 사용자의 이름으로 특정 시리즈에 새로운 평점 정보를 등록합니다.
 - `PUT /ratings/{seriesId}`: 인증된 사용자가 본인이 남긴 평점 정보를 수정합니다.
 - `DELETE /ratings/{seriesId}`: 인증된 사용자가 본인이 등록한 평점을 삭제하여 리뷰 권한을 회수합니다.
+
+
+## 🖥️ Swagger
+- `GET /swagger-ui/index.html`: Swagger를 통해서 각 API의 동작을 실현해볼 수 있습니다.
+
+---
+
+## TODO
+- Bean Validation 적용하여 클라이언트 측에 부적합한 입력에 대한 에러 발생시키기
+- Application Profile 분리하여 테스트 환경과 운영환경 분리

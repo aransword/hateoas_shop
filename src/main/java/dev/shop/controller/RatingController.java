@@ -9,7 +9,11 @@ import dev.shop.repository.SeriesRepository;
 import dev.shop.repository.UserRepository;
 import dev.shop.request.RatingRequest;
 import dev.shop.response.RatingResponse;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -27,6 +31,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 @RestController
 @RequestMapping("/ratings")
 @RequiredArgsConstructor
+@Tag(name = "평점 정보 API", description = "평점을 조회하고 남기거나 수정, 삭제할 수 있다.")
 public class RatingController {
     private final RatingRepository ratingRepository;
     private final UserRepository userRepository;
@@ -34,7 +39,8 @@ public class RatingController {
     private final PagedResourcesAssembler<Rating> assembler;
 
     @GetMapping("/search")
-    public EntityModel<RatingResponse> getRating(@RequestParam String username, @RequestParam long seriesId) {
+    @Operation(summary = "특정 평점 조회", description = "어떤 시리즈에 대해 특정 사용자가 남긴 평점을 조회한다.")
+    public EntityModel<RatingResponse> getRating(@Parameter(name = "사용자 ID") @RequestParam String username, @Parameter(name = "시리즈 ID") @RequestParam long seriesId) {
         RatingId id = new RatingId(username, seriesId);
         Rating rating = ratingRepository.findById(id).orElseThrow(() -> new RuntimeException("평점을 찾을 수 없음."));
 
@@ -49,7 +55,8 @@ public class RatingController {
     }
 
     @GetMapping("/list")
-    public PagedModel<EntityModel<RatingResponse>> getRatingList(@PageableDefault(size = 5)Pageable pageable) {
+    @Operation(summary = "평점 목록 조회", description = "모든 평점을 페이지 단위로 조회한다.")
+    public PagedModel<EntityModel<RatingResponse>> getRatingList(@ParameterObject @PageableDefault(size = 5)Pageable pageable) {
         Page<Rating> ratingPage = ratingRepository.findAll(pageable);
 
         return assembler.toModel(ratingPage, rating -> {
@@ -71,9 +78,10 @@ public class RatingController {
      * 예: GET /ratings/user/spring_fan?page=0&size=5
      */
     @GetMapping("/user/{username}")
+    @Operation(summary = "유저 별 평점 조회", description = "특정 사용자가 남긴 모든 평점을 조회한다.")
     public PagedModel<EntityModel<RatingResponse>> getRatingsByUser(
-            @PathVariable String username,
-            @PageableDefault(size = 5) Pageable pageable) {
+            @Parameter(name = "사용자 ID", example = "user") @PathVariable String username,
+            @ParameterObject @PageableDefault(size = 5) Pageable pageable) {
 
         Page<Rating> ratingPage = ratingRepository.findByUser_Username(username, pageable);
 
@@ -96,9 +104,10 @@ public class RatingController {
      * 예: GET /ratings/series/3?page=0&size=5
      */
     @GetMapping("/series/{seriesId}")
+    @Operation(summary = "시리즈 별 평점 조회", description = "특정 시리즈에 달린 모든 평점을 조회한다.")
     public PagedModel<EntityModel<RatingResponse>> getRatingsBySeries(
-            @PathVariable Long seriesId,
-            @PageableDefault(size = 5) Pageable pageable) {
+            @Parameter(name = "시리즈 ID") @PathVariable Long seriesId,
+            @ParameterObject @PageableDefault(size = 5) Pageable pageable) {
 
         Page<Rating> ratingPage = ratingRepository.findBySeries_SeriesId(seriesId, pageable);
 
@@ -124,6 +133,7 @@ public class RatingController {
      * @return
      */
     @PostMapping
+    @Operation(summary = "평점 등록", description = "인증된 사용자의 토큰을 받아서 평점을 등록한다.")
     public ResponseEntity<EntityModel<RatingResponse>> createRating(
             @RequestBody RatingRequest request,
             @AuthenticationPrincipal UserDetails userDetails) { // 핵심 포인트!
@@ -164,6 +174,7 @@ public class RatingController {
      * 예: PUT /ratings/3
      */
     @PutMapping("/{seriesId}")
+    @Operation(summary = "평점 수정", description = "자신이 작성한 평점을 수정한다.")
     public ResponseEntity<EntityModel<RatingResponse>> updateRating(
             @PathVariable Long seriesId,
             @RequestBody RatingRequest request,
@@ -201,6 +212,7 @@ public class RatingController {
      * 예: DELETE /ratings/3
      */
     @DeleteMapping("/{seriesId}")
+    @Operation(summary = "평점 삭제", description = "자신이 작성한 평점을 삭제한다.")
     public ResponseEntity<?> deleteRating(
             @PathVariable Long seriesId,
             @AuthenticationPrincipal UserDetails userDetails) {
